@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.eschoe.hexagonal.order.adapter.out.persistence.OrderMapper">
+
+    <resultMap id="orderResult" type="io.github.eschoe.hexagonal.order.adapter.out.persistence.OrderEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="status" column="status"/>
+        <result property="totalAmount" column="total_amount"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <resultMap id="orderItemResult" type="io.github.eschoe.hexagonal.order.adapter.out.persistence.OrderItemEntity">
+        <id property="id" column="id"/>
+        <result property="orderId" column="order_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="quantity" column="quantity"/>
+    </resultMap>
+
+    <select id="findById" resultMap="orderResult">
+        SELECT id, user_id, status, total_amount, created_at FROM orders WHERE id = #{id}
+    </select>
+
+    <select id="findByUserId" resultMap="orderResult">
+        SELECT id, user_id, status, total_amount, created_at
+        FROM orders
+        WHERE user_id = #{userId}
+        ORDER BY id DESC
+    </select>
+
+    <insert id="insertOrder" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO orders (user_id, status, total_amount, created_at)
+        VALUES (#{userId}, #{status}, #{totalAmount}, #{createdAt})
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE orders SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <select id="findItemsByOrderId" resultMap="orderItemResult">
+        SELECT id, order_id, product_id, product_name, unit_price, quantity
+        FROM order_items
+        WHERE order_id = #{orderId}
+        ORDER BY id
+    </select>
+
+    <insert id="insertItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity)
+        VALUES (#{orderId}, #{productId}, #{productName}, #{unitPrice}, #{quantity})
+    </insert>
+
+</mapper>

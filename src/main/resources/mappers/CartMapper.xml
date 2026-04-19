@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="io.github.eschoe.hexagonal.cart.adapter.out.persistence.CartMapper">
+
+    <resultMap id="cartResult" type="io.github.eschoe.hexagonal.cart.adapter.out.persistence.CartEntity">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+    </resultMap>
+
+    <resultMap id="cartItemResult" type="io.github.eschoe.hexagonal.cart.adapter.out.persistence.CartItemEntity">
+        <id property="id" column="id"/>
+        <result property="cartId" column="cart_id"/>
+        <result property="productId" column="product_id"/>
+        <result property="productName" column="product_name"/>
+        <result property="unitPrice" column="unit_price"/>
+        <result property="quantity" column="quantity"/>
+    </resultMap>
+
+    <select id="findByUserId" resultMap="cartResult">
+        SELECT id, user_id FROM carts WHERE user_id = #{userId}
+    </select>
+
+    <insert id="insertCart" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO carts (user_id) VALUES (#{userId})
+    </insert>
+
+    <select id="findItemsByCartId" resultMap="cartItemResult">
+        SELECT id, cart_id, product_id, product_name, unit_price, quantity
+        FROM cart_items
+        WHERE cart_id = #{cartId}
+        ORDER BY id
+    </select>
+
+    <insert id="insertItem" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO cart_items (cart_id, product_id, product_name, unit_price, quantity)
+        VALUES (#{cartId}, #{productId}, #{productName}, #{unitPrice}, #{quantity})
+    </insert>
+
+    <delete id="deleteItemsByCartId">
+        DELETE FROM cart_items WHERE cart_id = #{cartId}
+    </delete>
+
+</mapper>
